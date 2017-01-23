@@ -9,20 +9,31 @@
 import SpriteKit
 import GameplayKit
 
-class GameScene: SKScene {
+class GameScene: SKScene, SKPhysicsContactDelegate {
     
     // creates the node
     let myNode = SKSpriteNode(imageNamed: "Spaceship")
     
     override func didMove(to view: SKView) {
         
-        // will position node in centre and scale image
+        physicsWorld.contactDelegate = self
+        
+        // will position node in centre and scale image+
         myNode.position = CGPoint(x: 0, y: 350)
         myNode.setScale(0.8)
         
         // creates a body of the node - by default physicsbody is affected by gravity
         myNode.physicsBody = SKPhysicsBody(circleOfRadius: myNode.size.height / 2)
         myNode.physicsBody?.affectedByGravity = true
+        
+        // category bitmask is a number defining the type of object this is for considering collisions.
+        myNode.physicsBody?.categoryBitMask = 0
+        
+        // collision bit mask is a number defining what categories of objects this node should collide with - aka this node will collide with node2
+        myNode.physicsBody?.collisionBitMask = 1
+
+        // contact test bit mask is a number defining which collision we want to be notified about
+        myNode.physicsBody?.contactTestBitMask = 1
         
         
         let node2 = SKSpriteNode(imageNamed: "Spaceship")
@@ -34,16 +45,22 @@ class GameScene: SKScene {
         // creates a body of the node - by default physicsbody is affected by gravity
         node2.physicsBody = SKPhysicsBody(circleOfRadius: node2.size.height / 2)
         node2.physicsBody?.affectedByGravity = false
-        
-        // stops second node getting pushed off screen
-        node2.physicsBody?.isDynamic = false
-
+        node2.physicsBody?.categoryBitMask = 1
+        node2.physicsBody?.collisionBitMask = 0
         
         
         // add node via code
         self.addChild(myNode)
         self.addChild(node2)
         
+    }
+    
+    func didBegin(_ contact: SKPhysicsContact) {
+        print("We have a contact")
+    }
+    
+    func didEnd(_ contact: SKPhysicsContact) {
+        print("End of the contact")
     }
     
     // will register on release of button
@@ -115,6 +132,12 @@ class GameScene: SKScene {
 //myNode.alpha = 0
 //let action = SKAction.fadeIn(withDuration: TimeInterval(3))
 //myNode.run(action)
+
+//** stops second node getting pushed off screen***
+// creates a body of the node - by default physicsbody is affected by gravity
+//node2.physicsBody = SKPhysicsBody(circleOfRadius: node2.size.height / 2)
+//node2.physicsBody?.affectedByGravity = false
+//        node2.physicsBody?.isDynamic = false
 
 
 
